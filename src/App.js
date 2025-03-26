@@ -5,6 +5,8 @@ import Register from "./pages/auth/Register";
 import Login from "./pages/auth/Login";
 import Home from "./pages/Home";
 import AuthProvider from "./context/auth";
+import ForgotPassword from "./pages/auth/ForgetPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 
 function App() {
   return (
@@ -15,6 +17,9 @@ function App() {
           <Route path="/auth/register" element={<Register />} />
           <Route path="/auth/login" element={<Login />} />
           <Route path="/" element={<Home />} />
+          <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+          <Route path="/auth/reset-password" element={<ResetPassword />} />
+
         </Routes>
       </BrowserRouter>
     </AuthProvider>
