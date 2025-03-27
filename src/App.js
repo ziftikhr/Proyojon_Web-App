@@ -6,7 +6,7 @@ import Login from "./pages/auth/Login";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import Home from "./pages/Home";
-//import Profile from "./pages/Profile";
+import Profile from "./pages/Profile";
 import AuthProvider from "./context/auth";
 import PrivateRoute from "./components/PrivateRoute";
 //import Sell from "./pages/Sell";
@@ -28,7 +28,7 @@ function App() {
           <Route path="/auth/login" element={<Login />} />
           <Route path="/auth/forgot-password" element={<ForgotPassword />} />
           <Route path="/auth/reset-password" element={<ResetPassword />} />
-          {/*<Route path="/profile/:id" element={<Profile />} />*/}
+          <Route path="/profile/:id" element={<Profile />} />
           <Route path="/" element={<Home />} />
         </Routes>
       </BrowserRouter>
