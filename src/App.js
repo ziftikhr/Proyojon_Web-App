@@ -9,7 +9,7 @@ import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import AuthProvider from "./context/auth";
 import PrivateRoute from "./components/PrivateRoute";
-//import Sell from "./pages/Sell";
+import Sell from "./pages/Sell";
 //import MyFavorites from "./pages/MyFavorites";
 
 function App() {
@@ -18,12 +18,12 @@ function App() {
       <BrowserRouter>
         <Navbar />
         <Routes>
-          {/*
+          
           <Route element={<PrivateRoute />}>
             <Route path="/sell" element={<Sell />} />
-            <Route path="/favorites" element={<MyFavorites />} />
+            {/*<Route path="/favorites" element={<MyFavorites />} />*/}
           </Route>
-          */}
+          
           <Route path="/auth/register" element={<Register />} />
           <Route path="/auth/login" element={<Login />} />
           <Route path="/auth/forgot-password" element={<ForgotPassword />} />
