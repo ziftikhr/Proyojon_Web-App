@@ -10,7 +10,7 @@ import Profile from "./pages/Profile";
 import AuthProvider from "./context/auth";
 import PrivateRoute from "./components/PrivateRoute";
 import Sell from "./pages/Sell";
-//import MyFavorites from "./pages/MyFavorites";
+import MyFavorites from "./pages/MyFavorites";
 
 function App() {
   return (
@@ -21,7 +21,7 @@ function App() {
           
           <Route element={<PrivateRoute />}>
             <Route path="/sell" element={<Sell />} />
-            {/*<Route path="/favorites" element={<MyFavorites />} />*/}
+            {<Route path="/favorites" element={<MyFavorites />} />}
           </Route>
           
           <Route path="/auth/register" element={<Register />} />
