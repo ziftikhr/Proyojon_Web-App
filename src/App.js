@@ -21,7 +21,7 @@ function App() {
           
           <Route element={<PrivateRoute />}>
             <Route path="/sell" element={<Sell />} />
-            {<Route path="/favorites" element={<MyFavorites />} />}
+            <Route path="/favorites" element={<MyFavorites />} />
           </Route>
           
           <Route path="/auth/register" element={<Register />} />
