@@ -88,3 +88,41 @@ import {
     }, [user1]);
     
 }
+
+const deleteConversation = async () => {
+    if (!chat) return;
+  
+    const chatId = currentChatIdRef.current;
+    if (!chatId) return;
+  
+    try {
+      // Immediately clear messages from the UI
+      setMsgs([]);
+  
+      // Delete all messages in the conversation from Firestore
+      const msgsRef = collection(db, "messages", chatId, "chat");
+      const msgsSnapshot = await getDocs(msgsRef);
+      const deletePromises = msgsSnapshot.docs.map((doc) => deleteDoc(doc.ref));
+      await Promise.all(deletePromises);
+  
+      // Delete the conversation metadata from Firestore
+      await deleteDoc(doc(db, "messages", chatId));
+  
+      // Also remove the conversation from the inbox collection
+      const inboxRef = collection(db, "inbox"); // Replace with the correct inbox collection
+      const inboxSnapshot = await getDocs(inboxRef);
+      const conversationDoc = inboxSnapshot.docs.find(doc => doc.data().chatId === chatId);
+      if (conversationDoc) {
+        await deleteDoc(conversationDoc.ref);
+      }
+  
+      // Remove the conversation from the users list
+      setUsers(prevUsers => prevUsers.filter(user => user.ad.adId !== chat.ad.adId));
+  
+      // Clear the current chat state
+      setChat(null);
+      currentChatIdRef.current = null;
+    }  catch (error) {
+        console.error("Error deleting conversation:", error);
+      }
+    };
