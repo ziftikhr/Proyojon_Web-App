@@ -13,6 +13,13 @@ import MyFavorites from "./pages/MyFavorites";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserManagement from "./pages/admin/UserManagement";
 import UserAds from "./pages/admin/UserAds";
+import Ad from "./pages/Ad";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
+import Chat from "./pages/Chat";
+
+
+
 
 function App() {
   return (
@@ -24,7 +31,7 @@ function App() {
             <Route path="/sell" element={<Sell />} />
             <Route path="/favorites" element={<MyFavorites />} />
           </Route>
-          
+
           <Route element={<AdminRoute />}>
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<UserManagement />} />
