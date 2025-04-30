@@ -68,8 +68,8 @@ const AdminDashboard = () => {
         <div className="col-md-3 mb-3">
           <div className="card text-center">
             <div className="card-body">
-              <h5 className="card-title">Total Users</h5>
-              <h2 className="card-text">{stats.totalUsers}</h2>
+              <h5 className="card-title" style={{textAlign: "center"}}>Total Users</h5>
+              <h2 className="card-text" style={{fontSize: "30px"}}>{stats.totalUsers}</h2>
               {/* <Link to="/admin/users" className="btn btn-primary">
                 Manage Users
               </Link> */}
@@ -80,8 +80,8 @@ const AdminDashboard = () => {
         <div className="col-md-3 mb-3">
           <div className="card text-center">
             <div className="card-body">
-              <h5 className="card-title">Total Admins</h5>
-              <h2 className="card-text">{stats.totalAdmins}</h2>
+              <h5 className="card-title" style={{textAlign: "center"}}>Total Admins</h5>
+              <h2 className="card-text" style={{fontSize: "30px"}}>{stats.totalAdmins}</h2>
             </div>
           </div>
         </div>
@@ -89,8 +89,8 @@ const AdminDashboard = () => {
         <div className="col-md-3 mb-3">
           <div className="card text-center">
             <div className="card-body">
-              <h5 className="card-title">Active Listings</h5>
-              <h2 className="card-text">{stats.totalAds}</h2>
+              <h5 className="card-title" style={{textAlign: "center"}}>Active Listings</h5>
+              <h2 className="card-text" style={{fontSize: "30px"}}>{stats.totalAds}</h2>
             </div>
           </div>
         </div>
@@ -98,8 +98,8 @@ const AdminDashboard = () => {
         <div className="col-md-3 mb-3">
           <div className="card text-center">
             <div className="card-body">
-              <h5 className="card-title">Pending Listings</h5>
-              <h2 className="card-text">{stats.pendingAds}</h2>
+              <h5 className="card-title" style={{textAlign: "center"}}>Pending Listings</h5>
+              <h2 className="card-text" style={{fontSize: "30px"}}>{stats.pendingAds}</h2>
               {/* <Link to="/admin/pending" className="btn btn-warning">
                 Review Listings
               </Link> */}

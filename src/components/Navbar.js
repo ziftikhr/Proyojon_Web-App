@@ -83,24 +83,25 @@ const Navbar = () => {
                     </Link>
                   </li>
                 )}
-                <button
-  className="btn btn-danger btn-sm"
-  onClick={handleSignout}
-  style={{ padding: "1px 6px", lineHeight: "1" }} // compact vertical & horizontal
->
-  Logout
-</button>
-
+                <li className="nav-item" style={{height: "40px"}}>
+                  <button className="btn btn-secondary btn-sm" onClick={handleSignout}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M5 8a.5.5 0 0 1 .5-.5h5.793l-2.147-2.146a.5.5 0 0 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L11.293 8.5H5.5A.5.5 0 0 1 5 8z" />
+                      <path d="M3 0h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3z" />
+                    </svg>
+                    LOGOUT
+                  </button>
+                </li>
               </>
             ) : (
               <>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/auth/register">
+                <li className="nav-item" style={{height: "40px"}}>
+                  <Link className="btn btn-secondary btn-sm" to="/auth/register">
                     Register
                   </Link>
                 </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/auth/login">
+                <li className="nav-item" style={{height: "40px"}}>
+                  <Link className="btn btn-secondary btn-sm" to="/auth/login">
                     Login
                   </Link>
                 </li>

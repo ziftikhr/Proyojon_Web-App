@@ -7,9 +7,16 @@
 }
 
 .nav-item {
+    display: flex;
+    align-items: center;
     font-family: 'Inter';
     padding: 8px;
     font-weight: 600;
+}
+
+.nav-item:hover {
+    background-color: #f0f0f0;
+    border-radius: 10px;
 }
 
 .logout-btn {
@@ -19,7 +26,7 @@
     width: 80px;
     height: 40px;
     color: white;
-    border-radius: 30px;
+    border-radius: 10px;
     padding: 8px;
 }
 
