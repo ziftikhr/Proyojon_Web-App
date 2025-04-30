@@ -5,8 +5,8 @@ import { addDoc, collection, doc, setDoc, Timestamp } from "firebase/firestore";
 import { storage, db, auth } from "../firebaseConfig";
 import { useNavigate } from "react-router-dom";
 
-const categories = ["Stationaries", "Books", "Clothes", "Electronics", "Furniture","Vehicles & Parts","Games & Hobbies" ,"Miscellaneous"];
-const locations = ["Dhaka", "Chittagong", "Barishal","Mymensingh","Khulna","Rangpur","Sylhet"];
+const categories = ["Stationaries", "Books", "Clothes", "Electronics", "Furniture", "Vehicles & Parts", "Games & Hobbies", "Miscellaneous"];
+const locations = ["Dhaka", "Chittagong", "Barishal", "Mymensingh", "Khulna", "Rangpur", "Sylhet"];
 
 const Sell = () => {
   const navigate = useNavigate();
@@ -22,20 +22,17 @@ const Sell = () => {
     error: "",
     loading: false,
   });
-  const {
-    images,
-    title,
-    category,
-    price,
-    location,
-    contact,
-    description,
-    error,
-    loading,
-  } = values;
+
+  const { images, title, category, price, location, contact, description, error, loading } = values;
 
   const handleChange = (e) =>
     setValues({ ...values, [e.target.name]: e.target.value });
+
+  const handleImageChange = (e) => {
+    const files = e.target.files;
+    const fileArray = Array.from(files);
+    setValues({ ...values, images: fileArray });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,13 +46,12 @@ const Sell = () => {
         for (let image of images) {
           const imgRef = ref(storage, `ads/${Date.now()} - ${image.name}`);
           const result = await uploadBytes(imgRef, image);
-          const fileUrl = await getDownloadURL(
-            ref(storage, result.ref.fullPath)
-          );
+          const fileUrl = await getDownloadURL(ref(storage, result.ref.fullPath));
 
           imgs.push({ url: fileUrl, path: result.ref.fullPath });
         }
       }
+
       // add data into firestore
       const result = await addDoc(collection(db, "ads"), {
         images: imgs,
@@ -72,7 +68,7 @@ const Sell = () => {
 
       await setDoc(doc(db, 'favorites', result.id), {
         users: []
-      })
+      });
 
       setValues({
         images: [],
@@ -81,14 +77,16 @@ const Sell = () => {
         price: "",
         location: "",
         contact: "",
-        description,
+        description: "",
         loading: false,
       });
+
       navigate("/");
     } catch (error) {
       setValues({ ...values, error: error.message, loading: false });
     }
   };
+
   return (
     <form className="form shadow rounded p-3 mt-5" onSubmit={handleSubmit}>
       <h3 className="text-center mb-3">Create An Ad</h3>
@@ -104,9 +102,23 @@ const Sell = () => {
           style={{ display: "none" }}
           accept="image/*"
           multiple
-          onChange={(e) => setValues({ ...values, images: e.target.files })}
+          onChange={handleImageChange}
         />
       </div>
+
+      {images.length > 0 && (
+        <div className="image-preview d-flex flex-wrap justify-content-center">
+          {Array.from(images).map((image, index) => (
+            <img
+              key={index}
+              src={URL.createObjectURL(image)}
+              alt={`preview-${index}`}
+              style={{ width: "100px", height: "100px", objectFit: "cover", margin: "5px" }}
+            />
+          ))}
+        </div>
+      )}
+
       <div className="mb-3">
         <label className="form-label">Title</label>
         <input
