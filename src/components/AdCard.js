@@ -4,6 +4,7 @@ import { FaHeart } from "react-icons/fa";
 import { arrayRemove, arrayUnion, doc, getDoc, setDoc } from "firebase/firestore";
 import { auth, db } from "../firebaseConfig";
 import Moment from "react-moment";
+import "../styles/AdCard.css"; 
 
 const AdCard = ({ ad }) => {
   const [isFavorite, setIsFavorite] = useState(false);

@@ -8,6 +8,7 @@ const AdminDashboard = () => {
     totalUsers: 0,
     totalAds: 0,
     totalAdmins: 0,
+    pendingAds: 0,
     loading: true
   });
 
@@ -30,10 +31,16 @@ const AdminDashboard = () => {
         const adsSnapshot = await getCountFromServer(adsRef);
         const totalAds = adsSnapshot.data().count;
         
+        // Get pending ads count
+        const pendingAdsRef = collection(db, "pendingAds");
+        const pendingAdsSnapshot = await getCountFromServer(pendingAdsRef);
+        const pendingAds = pendingAdsSnapshot.data().count;
+        
         setStats({
           totalUsers: totalUsers - totalAdmins, // Regular users (excluding admins)
           totalAds,
           totalAdmins,
+          pendingAds,
           loading: false
         });
       } catch (error) {
@@ -58,7 +65,7 @@ const AdminDashboard = () => {
       <h2 className="mb-4">Admin Dashboard</h2>
       
       <div className="row">
-        <div className="col-md-4 mb-3">
+        <div className="col-md-3 mb-3">
           <div className="card text-center">
             <div className="card-body">
               <h5 className="card-title">Total Users</h5>
@@ -70,7 +77,7 @@ const AdminDashboard = () => {
           </div>
         </div>
         
-        <div className="col-md-4 mb-3">
+        <div className="col-md-3 mb-3">
           <div className="card text-center">
             <div className="card-body">
               <h5 className="card-title">Total Admins</h5>
@@ -79,11 +86,41 @@ const AdminDashboard = () => {
           </div>
         </div>
         
-        <div className="col-md-4 mb-3">
+        <div className="col-md-3 mb-3">
           <div className="card text-center">
             <div className="card-body">
-              <h5 className="card-title">Total Listings</h5>
+              <h5 className="card-title">Active Listings</h5>
               <h2 className="card-text">{stats.totalAds}</h2>
+            </div>
+          </div>
+        </div>
+        
+        <div className="col-md-3 mb-3">
+          <div className="card text-center">
+            <div className="card-body">
+              <h5 className="card-title">Pending Listings</h5>
+              <h2 className="card-text">{stats.pendingAds}</h2>
+              <Link to="/admin/pending" className="btn btn-warning">
+                Review Listings
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="row mt-4">
+        <div className="col-12">
+          <div className="card">
+            <div className="card-body">
+              <h5 className="card-title">Quick Actions</h5>
+              <div className="d-flex flex-wrap gap-2">
+                <Link to="/admin/pending" className="btn btn-outline-primary">
+                  Review Pending Listings ({stats.pendingAds})
+                </Link>
+                <Link to="/admin/users" className="btn btn-outline-secondary">
+                  Manage Users
+                </Link>
+              </div>
             </div>
           </div>
         </div>
