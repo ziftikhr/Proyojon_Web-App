@@ -144,9 +144,7 @@ const Ad = () => {
               <div className="d-flex justify-content-between align-items-center">
                 <h5 className="card-subtitle mb-2">{ad.title}</h5>
                 <h6 className="card-subtitle mb-2">
-                  {ad.Price && typeof ad.Price === 'string' && ad.Price.toLowerCase() === 'free' 
-                    ? 'Free' 
-                    : ad.Price ? `৳${ad.Price}` : 'Price not specified'}
+                TK- {Number(ad.price).toLocaleString()}
                 </h6>
               </div>
               <div className="d-flex justify-content-between">
