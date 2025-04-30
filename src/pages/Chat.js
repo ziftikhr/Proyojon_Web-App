@@ -126,3 +126,100 @@ const deleteConversation = async () => {
         console.error("Error deleting conversation:", error);
       }
     };
+
+    const selectUser = async (user) => {
+      if (!user || !user.ad) return;
+  
+      setChat(user);
+      const user2 = user.other.uid;
+      const id =
+        user1 > user2
+          ? `${user1}.${user2}.${user.ad.adId}`
+          : `${user2}.${user1}.${user.ad.adId}`;
+      
+      // Store the current chat ID in the ref
+      currentChatIdRef.current = id;
+      
+      const msgsRef = collection(db, "messages", id, "chat");
+      const q = query(msgsRef, orderBy("createdAt", "asc"));
+      const unsub = onSnapshot(q, (querySnapshot) => {
+        // Only update messages if this is still the active chat
+        if (currentChatIdRef.current === id) {
+          let msgs = [];
+          querySnapshot.forEach((doc) => msgs.push(doc.data()));
+          setMsgs(msgs);
+        }
+      });
+      
+      const docSnap = await getDoc(doc(db, "messages", id));
+      if (docSnap.exists()) {
+        if (docSnap.data().lastSender !== user1 && docSnap.data().lastUnread) {
+          await updateDoc(doc(db, "messages", id), {
+            lastUnread: false,
+          });
+          // Trigger a refresh of unread counts
+          getUnreadMessagesCount();
+        }
+      }
+      return () => unsub();
+    };
+  
+    const getChat = async (ad) => {
+      if (!ad || !ad.adId) return;
+  
+      const buyer = await getDoc(doc(db, "users", user1));
+      const seller = await getDoc(doc(db, "users", ad.postedBy));
+      setChat({ ad, me: buyer.data(), other: seller.data() });
+      
+      const chatId =
+        user1 > ad.postedBy
+          ? `${user1}.${ad.postedBy}.${ad.adId}`
+          : `${ad.postedBy}.${user1}.${ad.adId}`;
+      
+      // Store the current chat ID in the ref
+      currentChatIdRef.current = chatId;
+      
+      const adRef = doc(db, "ads", ad.adId);
+      const unsubAd = onSnapshot(adRef, async (adSnap) => {
+        if (!adSnap.exists() && currentChatIdRef.current === chatId) {
+          const chatRef = collection(db, "messages", chatId, "chat");
+          const chatSnapshot = await getDocs(chatRef);
+          const deletePromises = chatSnapshot.docs.map((doc) =>
+            deleteDoc(doc.ref)
+          );
+          await Promise.all(deletePromises);
+          await deleteDoc(doc(db, "messages", chatId));
+          setChat(null);
+          currentChatIdRef.current = null;
+        }
+      });
+      
+      // Set up message listener for this chat
+      const msgsRef = collection(db, "messages", chatId, "chat");
+      const q = query(msgsRef, orderBy("createdAt", "asc"));
+      const unsubMsgs = onSnapshot(q, (querySnapshot) => {
+        // Only update messages if this is still the active chat
+        if (currentChatIdRef.current === chatId) {
+          let msgs = [];
+          querySnapshot.forEach((doc) => msgs.push(doc.data()));
+          setMsgs(msgs);
+        }
+      });
+      
+      // Mark messages as read when opening this chat
+      const docSnap = await getDoc(doc(db, "messages", chatId));
+      if (docSnap.exists()) {
+        if (docSnap.data().lastSender !== user1 && docSnap.data().lastUnread) {
+          await updateDoc(doc(db, "messages", chatId), {
+            lastUnread: false,
+          });
+          // Refresh unread counts
+          getUnreadMessagesCount();
+        }
+      }
+      
+      return () => {
+        unsubAd();
+        unsubMsgs();
+      };
+    };
