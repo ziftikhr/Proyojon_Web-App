@@ -5,11 +5,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/auth";
 import { auth, db } from "../firebaseConfig";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js"; 
-
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 const Navbar = () => {
-  const { user } = useContext(AuthContext);
+  const { user, userData } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSignout = async () => {
@@ -59,6 +58,14 @@ const Navbar = () => {
                     My Favorites
                   </Link>
                 </li>
+                {/* Admin Dashboard Link */}
+                {userData && userData.role === "admin" && (
+                  <li className="nav-item">
+                    <Link className="nav-link" to={`/admin/dashboard`}>
+                      Admin Dashboard
+                    </Link>
+                  </li>
+                )}
                 <button
                   className="btn btn-danger btn-sm"
                   onClick={handleSignout}

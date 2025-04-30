@@ -9,8 +9,12 @@ import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import AuthProvider from "./context/auth";
 import PrivateRoute from "./components/PrivateRoute";
+import AdminRoute from "./components/AdminRoute";
 import Sell from "./pages/Sell";
 import MyFavorites from "./pages/MyFavorites";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import UserManagement from "./pages/admin/UserManagement";
+import UserAds from "./pages/admin/UserAds";
 
 function App() {
   return (
@@ -22,6 +26,12 @@ function App() {
           <Route element={<PrivateRoute />}>
             <Route path="/sell" element={<Sell />} />
             <Route path="/favorites" element={<MyFavorites />} />
+          </Route>
+          
+          <Route element={<AdminRoute />}>
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/users" element={<UserManagement />} />
+            <Route path="/admin/users/:userId/ads" element={<UserAds />} />
           </Route>
           
           <Route path="/auth/register" element={<Register />} />
