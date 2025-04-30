@@ -197,7 +197,7 @@ const Ad = () => {
                 <div className="text-center">
                   {showNumber ? (
                     <p>
-                      <FiPhoneCall size={20} /> Contact Number: {ad.contactnum}
+                      <FiPhoneCall size={20} /> Contact Number: {ad.contact}
                     </p>
                   ) : (
                     <button
@@ -213,7 +213,7 @@ const Ad = () => {
                       className="btn btn-secondary btn-sm mb-3"
                       onClick={createChatroom}
                     >
-                      Chat With Donor
+                      Chat With Owner
                     </button>
                   )}
                 </div>

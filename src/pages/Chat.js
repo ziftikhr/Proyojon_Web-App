@@ -31,10 +31,12 @@ const Chat = () => {
   const location = useLocation();
   const user1 = auth.currentUser?.uid;
   const currentChatIdRef = useRef(null);
+  const msgListenerRef = useRef(null); // Reference to store the message listener
 
   const [unreadCount, setUnreadCount] = useState(0);
-  const [userUnreadCounts, setUserUnreadCounts] = useState({}); // Track unread counts by chat
+  const [userUnreadCounts, setUserUnreadCounts] = useState({});
 
+  // Function to get unread message counts
   const getUnreadMessagesCount = async () => {
     if (!user1) return;
   
@@ -54,23 +56,35 @@ const Chat = () => {
           // Extract the user ID from the chat ID
           const chatParts = doc.id.split('.');
           const otherUserId = chatParts.find(id => id !== user1);
-          const adId = chatParts[2]; // Assuming adId is always the third part
+          const id = chatParts[2]; // Assuming id is always the third part
           
           // Create a unique key for this chat
-          const chatKey = `${otherUserId}-${adId}`;
+          const chatKey = `${otherUserId}-${id}`;
           
           // Increment count for this user/ad combo
           userCounts[chatKey] = (userCounts[chatKey] || 0) + 1;
         }
       });
   
-      setUnreadCount(count); // Update total unread count
-      setUserUnreadCounts(userCounts); // Update counts per chat
+      setUnreadCount(count);
+      setUserUnreadCounts(userCounts);
     } catch (error) {
       console.error("Error fetching unread messages:", error);
     }
   };
   
+  useEffect(() => {
+    if (user1) {
+      getUnreadMessagesCount();
+      const unsubscribe = onSnapshot(collection(db, "messages"), () => {
+        getUnreadMessagesCount();
+      });
+  
+      return () => unsubscribe();
+    }
+  }, [user1]);
+  
+  // Function to delete a conversation
   const deleteConversation = async () => {
     if (!chat) return;
   
@@ -80,6 +94,12 @@ const Chat = () => {
     try {
       // Immediately clear messages from the UI
       setMsgs([]);
+  
+      // Clean up message listener if it exists
+      if (msgListenerRef.current) {
+        msgListenerRef.current();
+        msgListenerRef.current = null;
+      }
   
       // Delete all messages in the conversation from Firestore
       const msgsRef = collection(db, "messages", chatId, "chat");
@@ -91,7 +111,7 @@ const Chat = () => {
       await deleteDoc(doc(db, "messages", chatId));
   
       // Also remove the conversation from the inbox collection
-      const inboxRef = collection(db, "inbox"); // Replace with the correct inbox collection
+      const inboxRef = collection(db, "inbox");
       const inboxSnapshot = await getDocs(inboxRef);
       const conversationDoc = inboxSnapshot.docs.find(doc => doc.data().chatId === chatId);
       if (conversationDoc) {
@@ -99,7 +119,7 @@ const Chat = () => {
       }
   
       // Remove the conversation from the users list
-      setUsers(prevUsers => prevUsers.filter(user => user.ad.adId !== chat.ad.adId));
+      setUsers(prevUsers => prevUsers.filter(user => user.ad.id !== chat.ad.id));
   
       // Clear the current chat state
       setChat(null);
@@ -108,7 +128,41 @@ const Chat = () => {
       console.error("Error deleting conversation:", error);
     }
   };
-
+  
+  // Function to set up message listener for a specific chat
+  const setupMessageListener = (chatId) => {
+    // Clean up previous listener if it exists
+    if (msgListenerRef.current) {
+      msgListenerRef.current();
+      msgListenerRef.current = null;
+    }
+    
+    // Set up new listener
+    const msgsRef = collection(db, "messages", chatId, "chat");
+    const q = query(msgsRef, orderBy("createdAt", "asc"));
+    
+    const unsub = onSnapshot(q, (querySnapshot) => {
+      // Only update messages if this is still the active chat
+      if (currentChatIdRef.current === chatId) {
+        let msgs = [];
+        querySnapshot.forEach((doc) => {
+          const msgData = doc.data();
+          // Include Firestore document ID if needed
+          msgs.push({ ...msgData, id: doc.id });
+        });
+        setMsgs(msgs);
+      }
+    }, (error) => {
+      console.error("Error in message listener:", error);
+    });
+    
+    // Store the unsubscribe function in the ref
+    msgListenerRef.current = unsub;
+    
+    return unsub;
+  };
+  
+  // Function to select a user to chat with
   const selectUser = async (user) => {
     if (!user || !user.ad) return;
 
@@ -116,38 +170,31 @@ const Chat = () => {
     const user2 = user.other.uid;
     const id =
       user1 > user2
-        ? `${user1}.${user2}.${user.ad.adId}`
-        : `${user2}.${user1}.${user.ad.adId}`;
+        ? `${user1}.${user2}.${user.ad.id}`
+        : `${user2}.${user1}.${user.ad.id}`;
     
     // Store the current chat ID in the ref
     currentChatIdRef.current = id;
     
-    const msgsRef = collection(db, "messages", id, "chat");
-    const q = query(msgsRef, orderBy("createdAt", "asc"));
-    const unsub = onSnapshot(q, (querySnapshot) => {
-      // Only update messages if this is still the active chat
-      if (currentChatIdRef.current === id) {
-        let msgs = [];
-        querySnapshot.forEach((doc) => msgs.push(doc.data()));
-        setMsgs(msgs);
-      }
-    });
+    // Set up message listener for this chat
+    setupMessageListener(id);
     
+    // Mark messages as read
     const docSnap = await getDoc(doc(db, "messages", id));
     if (docSnap.exists()) {
       if (docSnap.data().lastSender !== user1 && docSnap.data().lastUnread) {
         await updateDoc(doc(db, "messages", id), {
           lastUnread: false,
         });
-        // Trigger a refresh of unread counts
+        // Refresh unread counts
         getUnreadMessagesCount();
       }
     }
-    return () => unsub();
   };
 
+  // Function to initialize a chat from an ad
   const getChat = async (ad) => {
-    if (!ad || !ad.adId) return;
+    if (!ad || !ad.id) return;
 
     const buyer = await getDoc(doc(db, "users", user1));
     const seller = await getDoc(doc(db, "users", ad.postedBy));
@@ -155,15 +202,23 @@ const Chat = () => {
     
     const chatId =
       user1 > ad.postedBy
-        ? `${user1}.${ad.postedBy}.${ad.adId}`
-        : `${ad.postedBy}.${user1}.${ad.adId}`;
+        ? `${user1}.${ad.postedBy}.${ad.id}`
+        : `${ad.postedBy}.${user1}.${ad.id}`;
     
     // Store the current chat ID in the ref
     currentChatIdRef.current = chatId;
     
-    const adRef = doc(db, "ads", ad.adId);
+    // Set up listener for ad deletion
+    const adRef = doc(db, "ads", ad.id);
     const unsubAd = onSnapshot(adRef, async (adSnap) => {
       if (!adSnap.exists() && currentChatIdRef.current === chatId) {
+        // Clean up message listener
+        if (msgListenerRef.current) {
+          msgListenerRef.current();
+          msgListenerRef.current = null;
+        }
+        
+        // Delete chat messages and metadata
         const chatRef = collection(db, "messages", chatId, "chat");
         const chatSnapshot = await getDocs(chatRef);
         const deletePromises = chatSnapshot.docs.map((doc) =>
@@ -171,24 +226,17 @@ const Chat = () => {
         );
         await Promise.all(deletePromises);
         await deleteDoc(doc(db, "messages", chatId));
+        
+        // Clear chat state
         setChat(null);
         currentChatIdRef.current = null;
       }
     });
     
     // Set up message listener for this chat
-    const msgsRef = collection(db, "messages", chatId, "chat");
-    const q = query(msgsRef, orderBy("createdAt", "asc"));
-    const unsubMsgs = onSnapshot(q, (querySnapshot) => {
-      // Only update messages if this is still the active chat
-      if (currentChatIdRef.current === chatId) {
-        let msgs = [];
-        querySnapshot.forEach((doc) => msgs.push(doc.data()));
-        setMsgs(msgs);
-      }
-    });
+    setupMessageListener(chatId);
     
-    // Mark messages as read when opening this chat
+    // Mark messages as read
     const docSnap = await getDoc(doc(db, "messages", chatId));
     if (docSnap.exists()) {
       if (docSnap.data().lastSender !== user1 && docSnap.data().lastUnread) {
@@ -202,10 +250,14 @@ const Chat = () => {
     
     return () => {
       unsubAd();
-      unsubMsgs();
+      if (msgListenerRef.current) {
+        msgListenerRef.current();
+        msgListenerRef.current = null;
+      }
     };
   };
 
+  // Function to get all chats for the current user
   const getList = async () => {
     const msgRef = collection(db, "messages");
     const q = query(msgRef, where("users", "array-contains", user1));
@@ -233,15 +285,15 @@ const Chat = () => {
       
       if (adDoc.exists() && meDoc.exists() && otherDoc.exists()) {
         users.push({
-          ad: adDoc.data(),
-          me: meDoc.data(),
-          other: otherDoc.data(),
+          ad: { ...adDoc.data(), id: adDoc.id },
+          me: { ...meDoc.data(), uid: meRef.id },
+          other: { ...otherDoc.data(), uid: otherRef.id },
         });
         
         const unsub = onSnapshot(otherRef, (doc) => {
           setOnline((prev) => ({
             ...prev,
-            [doc.data().uid]: doc.data().isOnline,
+            [doc.id]: doc.data().isOnline,
           }));
         });
         
@@ -256,6 +308,23 @@ const Chat = () => {
     };
   };
 
+  // Effect to initialize chat and users list
+  useEffect(() => {
+    if (location.state?.ad) {
+      getChat(location.state.ad);
+    }
+    getList();
+    
+    // Clean up listeners on unmount
+    return () => {
+      if (msgListenerRef.current) {
+        msgListenerRef.current();
+        msgListenerRef.current = null;
+      }
+    };
+  }, [location.state]);
+
+  // Function to handle message submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!chat || !chat.ad || text.trim() === "") return;
@@ -263,35 +332,54 @@ const Chat = () => {
     const user2 = chat.other.uid;
     const chatId =
       user1 > user2
-        ? `${user1}.${user2}.${chat.ad.adId}`
-        : `${user2}.${user1}.${chat.ad.adId}`;
-  
-    // Create a temporary message object
-    const newMsg = {
-      text,
-      sender: user1,
-      createdAt: Timestamp.now(), // Keep it consistent with Firestore timestamps
-      tempId: Date.now(), // Temporary ID for UI rendering before Firestore syncs
-    };
-  
-    // Optimistically update the UI with the new message
-    setMsgs((prevMsgs) => [...prevMsgs, newMsg]);
+        ? `${user1}.${user2}.${chat.ad.id}`
+        : `${user2}.${user1}.${chat.ad.id}`;
+    
+    // Store the message text before clearing the input
+    const messageText = text;
     setText("");
   
     try {
+      // Create message object
+      const msgData = {
+        text: messageText,
+        sender: user1,
+        createdAt: Timestamp.now(),
+      };
+      
       // Add message to Firestore
-      await addDoc(collection(db, "messages", chatId, "chat"), newMsg);
+      await addDoc(collection(db, "messages", chatId, "chat"), msgData);
   
-      // Update last message details in Firestore
-      await updateDoc(doc(db, "messages", chatId), {
-        lastText: text,
-        lastSender: user1,
-        lastUnread: true,
-      });
+      // Check if this is a new conversation
+      const docSnap = await getDoc(doc(db, "messages", chatId));
+      if (!docSnap.exists()) {
+        // Create new conversation metadata
+        await updateDoc(doc(db, "messages", chatId), {
+          users: [user1, user2],
+          ad: chat.ad.id,
+          lastText: messageText,
+          lastSender: user1,
+          lastUnread: true,
+          createdAt: Timestamp.now(),
+        });
+      } else {
+        // Update existing conversation metadata
+        await updateDoc(doc(db, "messages", chatId), {
+          lastText: messageText,
+          lastSender: user1,
+          lastUnread: true,
+          updatedAt: Timestamp.now(),
+        });
+      }
+      
+      // Ensure message listener is active
+      if (!msgListenerRef.current) {
+        setupMessageListener(chatId);
+      }
     } catch (error) {
       console.error("Error sending message:", error);
-      // Rollback UI update in case of an error
-      setMsgs((prevMsgs) => prevMsgs.filter((msg) => msg.tempId !== newMsg.tempId));
+      // Restore text if sending failed
+      setText(messageText);
     }
   };
 
@@ -299,29 +387,9 @@ const Chat = () => {
   const getUnreadCountForUser = (user) => {
     if (!user || !user.ad || !user.other) return 0;
     
-    const chatKey = `${user.other.uid}-${user.ad.adId}`;
+    const chatKey = `${user.other.uid}-${user.ad.id}`;
     return userUnreadCounts[chatKey] || 0;
   };
-
-  // Setup unread message counter
-  useEffect(() => {
-    if (user1) {
-      getUnreadMessagesCount(); // Initial Fetch
-      const unsubscribe = onSnapshot(collection(db, "messages"), () => {
-        getUnreadMessagesCount(); // Real-time updates
-      });
-  
-      return () => unsubscribe();
-    }
-  }, [user1]);
-
-  // Setup chat based on location state
-  useEffect(() => {
-    if (location.state?.ad) {
-      getChat(location.state.ad);
-    }
-    getList();
-  }, [location.state]);
 
   return (
     <div className="row g-0">
@@ -354,7 +422,6 @@ const Chat = () => {
                )}
                <div className="user2-title-container">
                  <h3 className="user2-title">{chat.other.name}</h3>
-                 {/* Trash bin button to delete conversation */}
                  <div
                    className="delete-conversation-btn"
                    onClick={deleteConversation}
@@ -365,9 +432,15 @@ const Chat = () => {
                </div>
              </div>
              <div className="messages overflow-auto">
-              {msgs.map((msg, i) => (
-                <Message key={i} msg={msg} user1={user1} />
-              ))}
+              {msgs.length > 0 ? (
+                msgs.map((msg, i) => (
+                  <Message key={i} msg={msg} user1={user1} />
+                ))
+              ) : (
+                <div className="text-center mt-5">
+                  <p>No messages yet. Start the conversation!</p>
+                </div>
+              )}
             </div>
 
             <MessageForm
@@ -403,7 +476,7 @@ const Chat = () => {
               <div className="ad-details text-center mt-3">
                 <div className="p-2 user2-container">
                   <img
-                    src={chat.ad.images[0]?.url}
+                    src={chat.ad.images?.[0]?.url}
                     alt={chat.ad.title}
                     className="img-thumbnail mb-2"
                   />
@@ -412,12 +485,14 @@ const Chat = () => {
                   <h6 className="ad-title mb-1">{chat.ad.title}</h6>
                   <small className="text-muted">{chat.ad.price}</small>
                 </div>
-                <Link
-                  className="btn btn-secondary btn-sm mt-2"
-                  to={`/${chat.ad.category.toLowerCase()}/${chat.ad.adId}`}
-                >
-                  View Post
-                </Link>
+                {chat.ad?.category && chat.ad?.id && (
+                  <Link
+                    to={`/${chat.ad.category.toLowerCase()}/${chat.ad.id}`}
+                    className="btn btn-secondary btn-sm mt-2"
+                  >
+                    View Post
+                  </Link>
+                )}
               </div>
             </>
           )}
