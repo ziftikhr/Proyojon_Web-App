@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import { collection, orderBy, query, getDocs } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import AdCard from "../components/AdCard";
+import { useLocation } from "react-router-dom";
 
 const Home = () => {
+  const location = useLocation();
   const [ads, setAds] = useState([]);
   const [filteredAds, setFilteredAds] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -58,6 +60,12 @@ const Home = () => {
 
   return (
     <div className="container my-5">
+      {location.state?.message && (
+        <div className="alert alert-success alert-dismissible fade show mt-3" role="alert">
+          {location.state.message}
+          <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      )}
       {/* Search Bar */}
       <div className="row justify-content-center mb-4">
         <div className="col-md-8 position-relative">

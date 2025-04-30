@@ -52,22 +52,20 @@ const Sell = () => {
         }
       }
 
-      // add data into firestore
-      const result = await addDoc(collection(db, "ads"), {
+      // add data into pendingAds collection instead of ads
+      const result = await addDoc(collection(db, "pendingAds"), {
         images: imgs,
         title,
         category,
         price,
         location,
-        contact,
+        contactnum: contact,
         description,
         isSold: false,
+        status: "pending", // Add status field to track approval status
         publishedAt: Timestamp.fromDate(new Date()),
         postedBy: auth.currentUser.uid,
-      });
-
-      await setDoc(doc(db, 'favorites', result.id), {
-        users: []
+        createdAt: Timestamp.fromDate(new Date()),
       });
 
       setValues({
@@ -81,7 +79,8 @@ const Sell = () => {
         loading: false,
       });
 
-      navigate("/");
+      // Navigate to a thank you page or home with message
+      navigate("/", { state: { message: "Your listing has been submitted for review and will be visible once approved." } });
     } catch (error) {
       setValues({ ...values, error: error.message, loading: false });
     }
@@ -90,6 +89,9 @@ const Sell = () => {
   return (
     <form className="form shadow rounded p-3 mt-5" onSubmit={handleSubmit}>
       <h3 className="text-center mb-3">Create An Ad</h3>
+      <div className="alert alert-info">
+        <small>Note: All listings require admin approval before being published.</small>
+      </div>
       <div className="mb-3 text-center">
         <label htmlFor="image">
           <div className="btn btn-secondary btn-sm">
@@ -127,10 +129,11 @@ const Sell = () => {
           name="title"
           value={title}
           onChange={handleChange}
+          required
         />
       </div>
       <div className="mb-3">
-        <select name="category" className="form-select" onChange={handleChange}>
+        <select name="category" className="form-select" onChange={handleChange} required>
           <option value="">Select Category</option>
           {categories.map((category) => (
             <option value={category} key={category}>
@@ -147,10 +150,11 @@ const Sell = () => {
           name="price"
           value={price}
           onChange={handleChange}
+          required
         />
       </div>
       <div className="mb-3">
-        <select name="location" className="form-select" onChange={handleChange}>
+        <select name="location" className="form-select" onChange={handleChange} required>
           <option value="">Select Location</option>
           {locations.map((location) => (
             <option value={location} key={location}>
@@ -167,6 +171,7 @@ const Sell = () => {
           name="contact"
           value={contact}
           onChange={handleChange}
+          required
         />
       </div>
       <div className="mb-3">
@@ -178,12 +183,13 @@ const Sell = () => {
           className="form-control"
           value={description}
           onChange={handleChange}
+          required
         ></textarea>
       </div>
       {error ? <p className="text-center text-danger">{error}</p> : null}
       <div className="mb-3 text-center">
         <button className="btn btn-secondary btn-sm" disabled={loading}>
-          Create
+          {loading ? "Submitting..." : "Submit for Review"}
         </button>
       </div>
     </form>

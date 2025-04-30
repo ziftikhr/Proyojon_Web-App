@@ -12,6 +12,7 @@ import Sell from "./pages/Sell";
 import MyFavorites from "./pages/MyFavorites";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserManagement from "./pages/admin/UserManagement";
+import PendingListings from "./pages/admin/PendingListings";
 import UserAds from "./pages/admin/UserAds";
 import Ad from "./pages/Ad";
 import ForgotPassword from "./pages/auth/ForgotPassword";
@@ -37,6 +38,7 @@ function App() {
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<UserManagement />} />
             <Route path="/admin/users/:userId/ads" element={<UserAds />} />
+            <Route path="admin/pending" element={<PendingListings />} />
           </Route>
           
           <Route path="/auth/register" element={<Register />} />
