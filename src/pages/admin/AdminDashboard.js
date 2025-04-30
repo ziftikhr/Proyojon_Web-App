@@ -70,9 +70,9 @@ const AdminDashboard = () => {
             <div className="card-body">
               <h5 className="card-title">Total Users</h5>
               <h2 className="card-text">{stats.totalUsers}</h2>
-              <Link to="/admin/users" className="btn btn-primary">
+              {/* <Link to="/admin/users" className="btn btn-primary">
                 Manage Users
-              </Link>
+              </Link> */}
             </div>
           </div>
         </div>
@@ -100,9 +100,9 @@ const AdminDashboard = () => {
             <div className="card-body">
               <h5 className="card-title">Pending Listings</h5>
               <h2 className="card-text">{stats.pendingAds}</h2>
-              <Link to="/admin/pending" className="btn btn-warning">
+              {/* <Link to="/admin/pending" className="btn btn-warning">
                 Review Listings
-              </Link>
+              </Link> */}
             </div>
           </div>
         </div>
