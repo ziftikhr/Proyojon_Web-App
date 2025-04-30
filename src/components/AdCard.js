@@ -59,14 +59,21 @@ const AdCard = ({ ad }) => {
   }
 
   return (
-    <div className="card mb-3 shadow-sm">
+    <div className="card mb-3 shadow-sm position-relative">
       <Link to={`/${ad.category?.toLowerCase()}/${ad.id}`}>
-        <img
-          src={ad.images?.[0]?.url || "https://placehold.co/600x400?text=No+Image"}
-          className="card-img-top"
-          alt={ad.title || "Ad"}
-          style={{ height: "200px", objectFit: "cover" }}
-        />
+        <div className="position-relative">
+          <img
+            src={ad.images?.[0]?.url || "https://placehold.co/600x400?text=No+Image"}
+            className="card-img-top"
+            alt={ad.title || "Ad"}
+            style={{ height: "200px", objectFit: "cover" }}
+          />
+          {ad.isSold && (
+            <span className="badge bg-danger position-absolute top-0 end-0 m-2">
+              Booked
+            </span>
+          )}
+        </div>
       </Link>
       <div className="card-body">
         <div className="d-flex justify-content-between align-items-start">
@@ -80,10 +87,10 @@ const AdCard = ({ ad }) => {
           )}
         </div>
         <p className="card-text">
-            TK- {Number(ad.price).toLocaleString()}
+          TK- {Number(ad.price).toLocaleString()}
         </p>
         <p className="text-primary small mb-2">
-            Category: {ad.category || "N/A"}
+          Category: {ad.category || "N/A"}
         </p>
         <div className="d-flex justify-content-between text-muted small">
           <span>{ad.location || "Unknown location"}</span>
