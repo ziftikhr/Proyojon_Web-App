@@ -1,0 +1,70 @@
+.category{
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+    padding: 4px 10px 4px 10px;
+    border-radius: 10px;
+}
+
+.card-text{
+    font-family: 'Inter';
+    font-size: 1rem;
+    padding-top: 0;
+}
+
+.card-title{
+    font-family: 'Inter';
+    font-weight: bold;
+    font-size: 1.25rem;
+    text-align: start;
+    text-transform: capitalize;
+    padding-top: 0;
+}
+
+.card{
+    box-shadow: 0px 0px 10px 2px #d3d3d3;
+    transition: transform 0.3s ease;
+    z-index: 1;
+}
+
+.card:hover{
+    transform: scale(1.1);
+    z-index: 10;
+}
+
+/* .booked-badge {
+    position: absolute;
+    top: 10px;
+    left: 0;
+    background: red;
+    color: white;
+    padding: 5px 40px;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transform: rotate(-15deg);
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+  } */
+  
+  .booked-badge-wrapper {
+    position: absolute;
+    top: 10px;
+    right: 5px; /* Moves it further to the right */
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    padding-right: 10px; /* Adds some space from the edge */
+  }
+  
+  .booked-badge {
+    background: red;
+    color: white;
+    padding: 5px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-radius: 5px;
+  }
+  
+  
