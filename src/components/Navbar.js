@@ -6,7 +6,11 @@ import { AuthContext } from "../context/auth";
 import { auth, db } from "../firebaseConfig";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
+
+import logo from "../assets/logo.png";
+
 import "../styles/Navbar.css";
+
 
 const Navbar = () => {
   const { user, userData } = useContext(AuthContext);
@@ -26,9 +30,16 @@ const Navbar = () => {
   return (
     <nav className="navbar navbar-expand-md bg-light navbar-light sticky-top shadow-sm">
       <div className="container">
-        <Link className="navbar-brand" to="/">
-          Proyojon
-        </Link>
+      <Link className="navbar-brand d-flex align-items-center" to="/">
+  <img
+    src={logo}
+    alt="Proyojon Logo"
+    style={{ height: "40px", marginRight: "10px" }}
+  />
+  <span style={{ fontFamily: "Poppins", fontWeight: "bold", fontSize: "24px" }}>
+  Proyojon
+</span>
+</Link>
         <button
           className="navbar-toggler"
           type="button"
@@ -73,11 +84,13 @@ const Navbar = () => {
                   </li>
                 )}
                 <button
-                  className="btn btn-danger btn-sm"
-                  onClick={handleSignout}
-                >
-                  Logout
-                </button>
+  className="btn btn-danger btn-sm"
+  onClick={handleSignout}
+  style={{ padding: "1px 6px", lineHeight: "1" }} // compact vertical & horizontal
+>
+  Logout
+</button>
+
               </>
             ) : (
               <>
