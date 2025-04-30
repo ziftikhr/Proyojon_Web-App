@@ -7,12 +7,17 @@ import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import AuthProvider from "./context/auth";
 import PrivateRoute from "./components/PrivateRoute";
+import AdminRoute from "./components/AdminRoute";
 import Sell from "./pages/Sell";
 import MyFavorites from "./pages/MyFavorites";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import UserManagement from "./pages/admin/UserManagement";
+import UserAds from "./pages/admin/UserAds";
 import Ad from "./pages/Ad";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import Chat from "./pages/Chat";
+
 
 
 
@@ -27,6 +32,13 @@ function App() {
             <Route path="/favorites" element={<MyFavorites />} />
             <Route path="/Chat" element={<Chat />} />
           </Route>
+
+          <Route element={<AdminRoute />}>
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/users" element={<UserManagement />} />
+            <Route path="/admin/users/:userId/ads" element={<UserAds />} />
+          </Route>
+          
           <Route path="/auth/register" element={<Register />} />
           <Route path="/auth/login" element={<Login />} />
           <Route path="/auth/forgot-password" element={<ForgotPassword />} />
