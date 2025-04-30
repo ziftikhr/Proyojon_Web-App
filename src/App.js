@@ -3,8 +3,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Register from "./pages/auth/Register";
 import Login from "./pages/auth/Login";
-import ForgotPassword from "./pages/auth/ForgotPassword";
-import ResetPassword from "./pages/auth/ResetPassword";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import AuthProvider from "./context/auth";
@@ -15,6 +13,13 @@ import MyFavorites from "./pages/MyFavorites";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserManagement from "./pages/admin/UserManagement";
 import UserAds from "./pages/admin/UserAds";
+import Ad from "./pages/Ad";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
+import Chat from "./pages/Chat";
+
+
+
 
 function App() {
   return (
@@ -22,12 +27,12 @@ function App() {
       <BrowserRouter>
         <Navbar />
         <Routes>
-          
           <Route element={<PrivateRoute />}>
             <Route path="/sell" element={<Sell />} />
             <Route path="/favorites" element={<MyFavorites />} />
+            <Route path="/Chat" element={<Chat />} />
           </Route>
-          
+
           <Route element={<AdminRoute />}>
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<UserManagement />} />
@@ -39,6 +44,7 @@ function App() {
           <Route path="/auth/forgot-password" element={<ForgotPassword />} />
           <Route path="/auth/reset-password" element={<ResetPassword />} />
           <Route path="/profile/:id" element={<Profile />} />
+          <Route path="/:category/:id" element={<Ad />} />
           <Route path="/" element={<Home />} />
         </Routes>
       </BrowserRouter>
