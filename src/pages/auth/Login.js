@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { auth, db } from "../../firebaseConfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, getDoc } from "firebase/firestore";
 import { useNavigate, Link } from "react-router-dom";
-
 
 const Login = () => {
   const [values, setValues] = useState({
@@ -33,9 +32,14 @@ const Login = () => {
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
 
+      // Set user online status
       await updateDoc(doc(db, "users", result.user.uid), {
         isOnline: true,
       });
+
+      // Get user data to check role
+      const userDoc = await getDoc(doc(db, "users", result.user.uid));
+      const userData = userDoc.data();
 
       setValues({
         email: "",
@@ -44,11 +48,17 @@ const Login = () => {
         loading: false,
       });
 
-      navigate("/", { replace: true });
+      // Redirect based on role
+      if (userData && userData.role === "admin") {
+        navigate("/admin/dashboard", { replace: true });
+      } else {
+        navigate("/", { replace: true });
+      }
     } catch (error) {
       setValues({ ...values, error: error.message, loading: false });
     }
   };
+  
   return (
     <form className="shadow rounded p-3 mt-5 form" onSubmit={handleSubmit}>
       <h3 className="text-center mb-3">Log Into Your Account</h3>
