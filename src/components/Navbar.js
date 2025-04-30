@@ -6,6 +6,7 @@ import { AuthContext } from "../context/auth";
 import { auth, db } from "../firebaseConfig";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import "../styles/Navbar.css";
 
 const Navbar = () => {
   const { user, userData } = useContext(AuthContext);
