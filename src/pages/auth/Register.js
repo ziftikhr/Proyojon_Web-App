@@ -3,7 +3,7 @@ import { auth, db } from "../../firebaseConfig";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { setDoc, doc, Timestamp } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
-import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import eye icons
+import { FaEye, FaEyeSlash } from "react-icons/fa"; 
 
 const Register = () => {
   const [values, setValues] = useState({
@@ -11,20 +11,19 @@ const Register = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "user", // Default role is user
-    secretKey: "", // Field for admin secret key
+    role: "user", 
+    secretKey: "", 
     error: "",
     loading: false,
   });
 
-  const [showPassword, setShowPassword] = useState(false); // Toggle for password visibility
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Toggle for confirm password visibility
-
+  const [showPassword, setShowPassword] = useState(false); 
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); 
   const navigate = useNavigate();
 
   const { name, email, password, confirmPassword, role, secretKey, error, loading } = values;
 
-  const ADMIN_SECRET_KEY = "AK-47_911"; // Replace with your actual secret key
+  const ADMIN_SECRET_KEY = "AK-47_911"; 
 
   const handleChange = (e) =>
     setValues({ ...values, [e.target.name]: e.target.value });
@@ -55,7 +54,7 @@ const Register = () => {
         uid: result.user.uid,
         name,
         email,
-        role, // Save user role
+        role, 
         createdAt: Timestamp.fromDate(new Date()),
         isOnline: true,
       });
@@ -71,11 +70,10 @@ const Register = () => {
         loading: false,
       });
 
-      // Navigate to the appropriate dashboard based on the role
       if (role === "admin") {
-        navigate("/admin/dashboard", { replace: true }); // Redirect to admin dashboard
+        navigate("/admin/dashboard", { replace: true }); 
       } else {
-        navigate("/", { replace: true }); // Redirect to home page for regular users
+        navigate("/", { replace: true }); 
       }
     } catch (error) {
       setValues({ ...values, error: error.message, loading: false });

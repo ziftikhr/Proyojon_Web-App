@@ -14,7 +14,7 @@ const MyFavorites = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
 
-  // First wait for auth to be ready
+  
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -23,12 +23,11 @@ const MyFavorites = () => {
     return () => unsubscribe();
   }, []);
 
-  // Then fetch ads when user is available
+  
   useEffect(() => {
     if (user) {
       getAds();
     } else if (user === null) {
-      // User state has been determined (not undefined), but no user is logged in
       setLoading(false);
     }
   }, [user]);
@@ -43,7 +42,6 @@ const MyFavorites = () => {
         return;
       }
   
-      // Step 1: Get all favorite ad IDs for the user
       const favRef = collection(db, "favorites");
       const favQuery = query(favRef, where("users", "array-contains", user.uid));
       const favoritesSnapshot = await getDocs(favQuery);
@@ -56,8 +54,7 @@ const MyFavorites = () => {
         return;
       }
   
-      // Step 2: Batch fetch ads using where '__name__' in [ids]
-      const CHUNK_SIZE = 10; // Firestore supports max 10 per 'in' query
+      const CHUNK_SIZE = 10; 
       const chunks = [];
   
       for (let i = 0; i < adIds.length; i += CHUNK_SIZE) {
@@ -84,7 +81,6 @@ const MyFavorites = () => {
   };
   
 
-  // Show login prompt if no user
   if (user === null) {
     return (
       <div className="mt-5 container">

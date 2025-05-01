@@ -18,7 +18,6 @@ const UserManagement = () => {
         const usersList = [];
         querySnapshot.forEach((doc) => {
           const userData = doc.data();
-          // Only add regular users, not admins
           if (userData.role !== "admin") {
             usersList.push({
               id: doc.id,
@@ -44,12 +43,10 @@ const UserManagement = () => {
         role: makeAdmin ? "admin" : "user"
       });
       
-      // Update local state
       setUsers(users.map(user => 
         user.id === userId ? { ...user, role: makeAdmin ? "admin" : "user" } : user
       ));
       
-      // If making an admin, remove from list
       if (makeAdmin) {
         setUsers(users.filter(user => user.id !== userId));
       }

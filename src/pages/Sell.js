@@ -41,7 +41,7 @@ const Sell = () => {
 
     try {
       let imgs = [];
-      // loop through images
+      
       if (images.length) {
         for (let image of images) {
           const imgRef = ref(storage, `ads/${Date.now()} - ${image.name}`);
@@ -52,7 +52,7 @@ const Sell = () => {
         }
       }
 
-      // add data into pendingAds collection instead of ads
+      
       const result = await addDoc(collection(db, "pendingAds"), {
         images: imgs,
         title,
@@ -62,7 +62,7 @@ const Sell = () => {
         contactnum: contact,
         description,
         isSold: false,
-        status: "pending", // Add status field to track approval status
+        status: "pending", 
         publishedAt: Timestamp.fromDate(new Date()),
         postedBy: auth.currentUser.uid,
         createdAt: Timestamp.fromDate(new Date()),
@@ -79,7 +79,6 @@ const Sell = () => {
         loading: false,
       });
 
-      // Navigate to a thank you page or home with message
       navigate("/", { state: { message: "Your listing has been submitted for review and will be visible once approved." } });
     } catch (error) {
       setValues({ ...values, error: error.message, loading: false });

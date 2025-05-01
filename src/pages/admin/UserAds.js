@@ -15,13 +15,11 @@ const UserAds = () => {
   useEffect(() => {
     const fetchUserAndAds = async () => {
       try {
-        // Fetch user data
         const userDoc = await getDoc(doc(db, "users", userId));
         if (userDoc.exists()) {
           setUser(userDoc.data());
         }
 
-        // Fetch user's ads
         const adsRef = collection(db, "ads");
         const q = query(
           adsRef,
@@ -51,12 +49,10 @@ const UserAds = () => {
       try {
         setDeleteStatus({ isDeleting: true, message: "Deleting ad..." });
         
-        // Get the ad data first to access images
         const adDoc = await getDoc(doc(db, "ads", adId));
         if (adDoc.exists()) {
           const adData = adDoc.data();
           
-          // 1. Delete all images from storage
           if (adData.images && adData.images.length > 0) {
             for (const image of adData.images) {
               if (image.path) {
@@ -65,17 +61,15 @@ const UserAds = () => {
                   await deleteObject(imgRef);
                 } catch (imgError) {
                   console.error("Error deleting image:", imgError);
-                  // Continue even if image deletion fails
+                  
                 }
               }
             }
           }
         }
         
-        // 2. Delete from ads collection
         await deleteDoc(doc(db, "ads", adId));
         
-        // 3. Delete from favorites collection (if exists)
         try {
           const favoritesRef = collection(db, "favorites");
           const favoritesQuery = query(favoritesRef, where("adId", "==", adId));
@@ -88,7 +82,6 @@ const UserAds = () => {
           console.log("Error deleting favorites:", error);
         }
         
-        // 4. Delete any associated messages/chatrooms
         const messagesRef = collection(db, "messages");
         const messagesQuery = query(messagesRef, where("ad", "==", adId));
         const messagesSnapshot = await getDocs(messagesQuery);
@@ -97,14 +90,12 @@ const UserAds = () => {
           await deleteDoc(doc.ref);
         });
         
-        // 5. Update local state
         setAds(ads.filter(ad => ad.id !== adId));
         setDeleteStatus({ 
           isDeleting: false, 
           message: "Ad successfully deleted from all locations" 
         });
         
-        // Clear success message after 3 seconds
         setTimeout(() => {
           setDeleteStatus({ isDeleting: false, message: "" });
         }, 3000);
@@ -193,11 +184,7 @@ const UserAds = () => {
                     </button>
                   </div>
                 </div>
-                {/* <div className="card-footer">
-                  <span className={`badge ${ad.isSold ? "bg-warning" : "bg-success"}`}>
-                    {ad.isSold ? "Booked" : "Available"}
-                  </span>
-                </div> */}
+                
               </div>
             </div>
           ))}

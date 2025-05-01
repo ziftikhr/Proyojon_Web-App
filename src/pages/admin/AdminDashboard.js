@@ -15,29 +15,25 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // Get users count
         const usersRef = collection(db, "users");
         const usersSnapshot = await getCountFromServer(usersRef);
         const totalUsers = usersSnapshot.data().count;
         
-        // Get admins count
         const adminsQuery = query(collection(db, "users"));
         const adminsSnapshot = await getDocs(adminsQuery);
         const admins = adminsSnapshot.docs.filter(doc => doc.data().role === "admin");
         const totalAdmins = admins.length;
         
-        // Get ads count
         const adsRef = collection(db, "ads");
         const adsSnapshot = await getCountFromServer(adsRef);
         const totalAds = adsSnapshot.data().count;
         
-        // Get pending ads count
         const pendingAdsRef = collection(db, "pendingAds");
         const pendingAdsSnapshot = await getCountFromServer(pendingAdsRef);
         const pendingAds = pendingAdsSnapshot.data().count;
         
         setStats({
-          totalUsers: totalUsers - totalAdmins, // Regular users (excluding admins)
+          totalUsers: totalUsers - totalAdmins, 
           totalAds,
           totalAdmins,
           pendingAds,
@@ -70,9 +66,6 @@ const AdminDashboard = () => {
             <div className="card-body">
               <h5 className="card-title" style={{textAlign: "center"}}>Total Users</h5>
               <h2 className="card-text" style={{fontSize: "30px"}}>{stats.totalUsers}</h2>
-              {/* <Link to="/admin/users" className="btn btn-primary">
-                Manage Users
-              </Link> */}
             </div>
           </div>
         </div>
@@ -100,9 +93,6 @@ const AdminDashboard = () => {
             <div className="card-body">
               <h5 className="card-title" style={{textAlign: "center"}}>Pending Listings</h5>
               <h2 className="card-text" style={{fontSize: "30px"}}>{stats.pendingAds}</h2>
-              {/* <Link to="/admin/pending" className="btn btn-warning">
-                Review Listings
-              </Link> */}
             </div>
           </div>
         </div>

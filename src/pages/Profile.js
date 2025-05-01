@@ -52,8 +52,8 @@ const Profile = () => {
   const handleInterestChange = (category) => {
     setInterests((prev) =>
       prev.includes(category)
-        ? prev.filter((interest) => interest !== category) // Remove if unchecked
-        : [...prev, category] // Add if checked
+        ? prev.filter((interest) => interest !== category) 
+        : [...prev, category] 
     );
   };
 
@@ -70,16 +70,16 @@ const Profile = () => {
   };
 
   const uploadImage = async () => {
-    // create image reference
+    
     const imgRef = ref(storage, `profile/${Date.now()} - ${img.name}`);
     if (user.photoUrl) {
       await deleteObject(ref(storage, user.photoPath));
     }
-    // upload image
+    
     const result = await uploadBytes(imgRef, img);
-    // get download url
+    
     const url = await getDownloadURL(ref(storage, result.ref.fullPath));
-    // update user doc
+    
     await updateDoc(doc(db, "users", auth.currentUser.uid), {
       photoUrl: url,
       photoPath: result.ref.fullPath,
@@ -89,15 +89,15 @@ const Profile = () => {
   };
 
   const getAds = async () => {
-    // create collection reference
+    
     const adsRef = collection(db, "ads");
-    // execute query
+    
     const q = query(
       adsRef,
       where("postedBy", "==", id),
       orderBy("publishedAt", "desc")
     );
-    // get data from firestore
+   
     const docs = await getDocs(q);
     let userAds = [];
     docs.forEach((doc) => {
@@ -109,17 +109,17 @@ const Profile = () => {
   const getAllAds = async () => {
     const currentDate = new Date();
     
-    // Calculate the date 3 days ago
+    
     const threeDaysAgo = new Date(currentDate.setDate(currentDate.getDate() - 3));
-    // create collection reference
+    
     const adsRef = collection(db, "ads");
-    // execute query
+    
     const q = query(
       adsRef,
       where("publishedAt", ">=", threeDaysAgo),
       orderBy("publishedAt", "desc")
     );
-    // get data from firestore
+   
     const docs = await getDocs(q);
     let recentAds = [];
     docs.forEach((doc) => {
@@ -129,7 +129,7 @@ const Profile = () => {
   };
 
   const toggleDropdown = () => {
-    setDropdownVisible(!dropdownVisible); // Toggle the dropdown visibility
+    setDropdownVisible(!dropdownVisible); 
   };
 
   useEffect(() => {

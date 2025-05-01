@@ -45,7 +45,6 @@ const PendingListings = () => {
     setActionLoading(prev => ({ ...prev, [ad.id]: true }));
     
     try {
-      // Add to ads collection
       const result = await addDoc(collection(db, "ads"), {
         images: ad.images,
         title: ad.title,
@@ -59,15 +58,12 @@ const PendingListings = () => {
         postedBy: ad.postedBy,
       });
 
-      // Create favorites entry for the new ad
       await setDoc(doc(db, 'favorites', result.id), {
         users: []
       });
 
-      // Delete from pendingAds
       await deleteDoc(doc(db, "pendingAds", ad.id));
       
-      // Update local state
       setPendingAds(pendingAds.filter(item => item.id !== ad.id));
       setActionLoading(prev => ({ ...prev, [ad.id]: false }));
     } catch (error) {
@@ -80,16 +76,13 @@ const PendingListings = () => {
     setActionLoading(prev => ({ ...prev, [ad.id]: true }));
     
     try {
-      // Delete images from storage
       for (const image of ad.images) {
         const imgRef = ref(storage, image.path);
         await deleteObject(imgRef);
       }
       
-      // Delete from pendingAds collection
       await deleteDoc(doc(db, "pendingAds", ad.id));
       
-      // Update local state
       setPendingAds(pendingAds.filter(item => item.id !== ad.id));
       setActionLoading(prev => ({ ...prev, [ad.id]: false }));
     } catch (error) {

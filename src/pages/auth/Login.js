@@ -32,12 +32,10 @@ const Login = () => {
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
 
-      // Set user online status
       await updateDoc(doc(db, "users", result.user.uid), {
         isOnline: true,
       });
 
-      // Get user data to check role
       const userDoc = await getDoc(doc(db, "users", result.user.uid));
       const userData = userDoc.data();
 
@@ -48,7 +46,6 @@ const Login = () => {
         loading: false,
       });
 
-      // Redirect based on role
       if (userData && userData.role === "admin") {
         navigate("/admin/dashboard", { replace: true });
       } else {

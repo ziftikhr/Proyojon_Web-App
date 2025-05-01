@@ -17,13 +17,12 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const handleSignout = async () => {
-    // update user doc
+    
     await updateDoc(doc(db, "users", user.uid), {
       isOnline: false,
     });
-    // logout
+  
     await signOut(auth);
-    // navigate to login
     navigate("/auth/login");
   };
 
@@ -75,7 +74,6 @@ const Navbar = () => {
                     My Favorites
                   </Link>
                 </li>
-                {/* Admin Dashboard Link */}
                 {userData && userData.role === "admin" && (
                   <li className="nav-item">
                     <Link className="nav-link" to={`/admin/dashboard`}>

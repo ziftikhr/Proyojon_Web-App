@@ -43,14 +43,14 @@ const Ad = () => {
     const confirm = window.confirm(`Delete ${ad.title}?`);
     if (confirm) {
       try {
-        // Delete images
+        
         for (const image of ad.images) {
           const imgRef = ref(storage, image.path);
           await deleteObject(imgRef);
         }
-        // Delete ad doc from Firestore
+        
         await deleteDoc(doc(db, "ads", id));
-        // Navigate to seller profile
+        
         navigate(`/profile/${auth.currentUser.uid}`);
       } catch (error) {
         console.error("Error deleting ad:", error);

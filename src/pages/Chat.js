@@ -31,12 +31,12 @@ const Chat = () => {
   const location = useLocation();
   const user1 = auth.currentUser?.uid;
   const currentChatIdRef = useRef(null);
-  const msgListenerRef = useRef(null); // Reference to store the message listener
+  const msgListenerRef = useRef(null); 
 
   const [unreadCount, setUnreadCount] = useState(0);
   const [userUnreadCounts, setUserUnreadCounts] = useState({});
 
-  // Function to get unread message counts
+  
   const getUnreadMessagesCount = async () => {
     if (!user1) return;
   
@@ -53,15 +53,15 @@ const Chat = () => {
         if (data.lastSender !== user1 && data.lastUnread === true) {
           count++;
           
-          // Extract the user ID from the chat ID
+          //extract the user ID from the chat ID
           const chatParts = doc.id.split('.');
           const otherUserId = chatParts.find(id => id !== user1);
-          const id = chatParts[2]; // Assuming id is always the third part
+          const id = chatParts[2]; 
           
-          // Create a unique key for this chat
+          //unique key for this chat
           const chatKey = `${otherUserId}-${id}`;
           
-          // Increment count for this user/ad combo
+          //increment count for this user/ad combo
           userCounts[chatKey] = (userCounts[chatKey] || 0) + 1;
         }
       });
@@ -84,7 +84,7 @@ const Chat = () => {
     }
   }, [user1]);
   
-  // Function to delete a conversation
+  
   const deleteConversation = async () => {
     if (!chat) return;
   
@@ -92,25 +92,25 @@ const Chat = () => {
     if (!chatId) return;
   
     try {
-      // Immediately clear messages from the UI
+      //clear messages from the UI
       setMsgs([]);
   
-      // Clean up message listener if it exists
+      // clean up message listener if it exists
       if (msgListenerRef.current) {
         msgListenerRef.current();
         msgListenerRef.current = null;
       }
   
-      // Delete all messages in the conversation from Firestore
+      // delete all messages in the conversation from Firestore
       const msgsRef = collection(db, "messages", chatId, "chat");
       const msgsSnapshot = await getDocs(msgsRef);
       const deletePromises = msgsSnapshot.docs.map((doc) => deleteDoc(doc.ref));
       await Promise.all(deletePromises);
   
-      // Delete the conversation metadata from Firestore
+      // delete the conversation metadata from Firestore
       await deleteDoc(doc(db, "messages", chatId));
   
-      // Also remove the conversation from the inbox collection
+      // also remove the conversation from the inbox collection
       const inboxRef = collection(db, "inbox");
       const inboxSnapshot = await getDocs(inboxRef);
       const conversationDoc = inboxSnapshot.docs.find(doc => doc.data().chatId === chatId);
@@ -118,10 +118,10 @@ const Chat = () => {
         await deleteDoc(conversationDoc.ref);
       }
   
-      // Remove the conversation from the users list
+      // remove the conversation from the users list
       setUsers(prevUsers => prevUsers.filter(user => user.ad.id !== chat.ad.id));
   
-      // Clear the current chat state
+      // clear the current chat state
       setChat(null);
       currentChatIdRef.current = null;
     } catch (error) {
@@ -129,25 +129,24 @@ const Chat = () => {
     }
   };
   
-  // Function to set up message listener for a specific chat
+  //function to set up message listener for a specific chat
   const setupMessageListener = (chatId) => {
-    // Clean up previous listener if it exists
+    //clean up previous listener if it exists
     if (msgListenerRef.current) {
       msgListenerRef.current();
       msgListenerRef.current = null;
     }
     
-    // Set up new listener
+    //set up new listener
     const msgsRef = collection(db, "messages", chatId, "chat");
     const q = query(msgsRef, orderBy("createdAt", "asc"));
     
     const unsub = onSnapshot(q, (querySnapshot) => {
-      // Only update messages if this is still the active chat
+      //update messages if this is still the active chat
       if (currentChatIdRef.current === chatId) {
         let msgs = [];
         querySnapshot.forEach((doc) => {
           const msgData = doc.data();
-          // Include Firestore document ID if needed
           msgs.push({ ...msgData, id: doc.id });
         });
         setMsgs(msgs);
@@ -155,14 +154,12 @@ const Chat = () => {
     }, (error) => {
       console.error("Error in message listener:", error);
     });
-    
-    // Store the unsubscribe function in the ref
     msgListenerRef.current = unsub;
     
     return unsub;
   };
   
-  // Function to select a user to chat with
+  
   const selectUser = async (user) => {
     if (!user || !user.ad) return;
 
@@ -205,7 +202,6 @@ const Chat = () => {
         ? `${user1}.${ad.postedBy}.${ad.id}`
         : `${ad.postedBy}.${user1}.${ad.id}`;
     
-    // Store the current chat ID in the ref
     currentChatIdRef.current = chatId;
     
     // Set up listener for ad deletion
