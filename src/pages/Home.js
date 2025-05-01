@@ -19,7 +19,7 @@ const Home = () => {
     { value: "clothes", label: "Clothes", image: "/images/clothes.png" },
     { value: "electronics", label: "Electronics", image: "/images/electronics.jpeg" },
     { value: "furniture", label: "Furniture", image: "/images/furniture.png" },
-    { value: "vehicles", label: "Vehicles & Parts", image: "/images/Vehicles.png" },
+    { value: "Vehicles & Parts", label: "Vehicles & Parts", image: "/images/Vehicles.png" },
     { value: "games", label: "Games & Hobbies", image: "/images/Controller.png" },
     { value: "miscellaneous", label: "Miscellaneous", image: "/images/misc.png" },
   ];
